@@ -1,5 +1,5 @@
-import { Canvas } from "@react-three/fiber"
-import { OrbitControls, Stars } from "@react-three/drei"
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls, Stars } from "@react-three/drei";
 import {
   EffectComposer,
   Bloom,
@@ -7,32 +7,37 @@ import {
   Noise,
   Vignette,
   Scanline,
-} from "@react-three/postprocessing"
-import { Vector2 } from "three"
+} from "@react-three/postprocessing";
+import { Vector2 } from "three";
 
-import type { Project } from "../data/projects"
-import { projects } from "../data/projects"
-import Node from "./Node"
-import Connections from "./Connections"
-import CameraRig from "./CameraRig"
-import NodeCard from "./NodeCard"
-import BackgroundBreath from "./BackgroundBreath"
+import type { Project } from "../data/projects";
+import { projects } from "../data/projects";
+import Node from "./Node";
+import Connections from "./Connections";
+import CameraRig from "./CameraRig";
+import NodeCard from "./NodeCard";
+import BackgroundBreath from "./BackgroundBreath";
 
 type Props = {
-  selected: Project | null
-  setSelected: (p: Project | null) => void
-  onOpenDetail: (p: Project) => void
-  query: string
-  hintActive: boolean
-}
+  selected: Project | null;
+  setSelected: (p: Project | null) => void;
+  onOpenDetail: (p: Project) => void;
+  query: string;
+  hintActive: boolean;
+};
 
-export default function Scene({ selected, setSelected, onOpenDetail, query, hintActive }: Props) {
+export default function Scene({
+  selected,
+  setSelected,
+  onOpenDetail,
+  query,
+  hintActive,
+}: Props) {
   return (
     <Canvas
       dpr={[1, 2]}
       gl={{ antialias: true }}
       camera={{ position: [0, 0, 8], fov: 45 }}
-      // ✅ ここ：何も当たらない場所クリックで解除
       onPointerMissed={() => setSelected(null)}
     >
       <color attach="background" args={["#050509"]} />
@@ -57,10 +62,8 @@ export default function Scene({ selected, setSelected, onOpenDetail, query, hint
         />
       ))}
 
-      {/* ✅ controls を CameraRig から触れるように */}
       <OrbitControls makeDefault enableZoom={false} enablePan={false} />
 
-      {/* ✅ 選択中は寄る、解除したら全体へ戻す */}
       <CameraRig selected={selected} />
 
       {selected && (
@@ -72,12 +75,16 @@ export default function Scene({ selected, setSelected, onOpenDetail, query, hint
       )}
 
       <EffectComposer>
-        <Bloom intensity={0.85} luminanceThreshold={0.3} luminanceSmoothing={0.9} />
+        <Bloom
+          intensity={0.85}
+          luminanceThreshold={0.3}
+          luminanceSmoothing={0.9}
+        />
         <ChromaticAberration offset={new Vector2(0.00035, 0.00035)} />
         <Scanline density={1.2} />
         <Noise opacity={0.02} />
         <Vignette eskil={false} offset={0.18} darkness={0.85} />
       </EffectComposer>
     </Canvas>
-  )
+  );
 }

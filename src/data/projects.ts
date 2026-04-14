@@ -1,19 +1,25 @@
-export type ProjectType = "core" | "project"
+export type ProjectType = "core" | "project";
+
+export interface ProjectLink {
+  label: string;
+  href: string;
+}
 
 export interface Project {
-  id: number
-  name: string
-  position: [number, number, number]
-  color: string
-  type: ProjectType
-  description?: string
-  stack?: string
-  link?: string
-  detail?: string
-  role?: string
-  year?: string
-  highlights?: string[]
-  images?: string[]
+  id: number;
+  name: string;
+  position: [number, number, number];
+  color: string;
+  type: ProjectType;
+  description?: string;
+  stack?: string;
+  link?: string;
+  links?: ProjectLink[];
+  detail?: string;
+  role?: string;
+  year?: string;
+  highlights?: string[];
+  images?: string[];
 }
 
 export const projects: Project[] = [
@@ -23,70 +29,96 @@ export const projects: Project[] = [
     position: [0, 0, 0],
     color: "#ffffff",
     type: "core",
-    description: "Creative Engineer / Builder",
-    stack: "SwiftUI • Node • WebGL • AWS",
-    detail:
-      "インタラクティブ体験を設計し、プロトタイプから本番まで一気通貫で作ることを大切にしています。",
-    role: "Creative Engineer",
+    description: "大学生",
+    stack: "SwiftUI • Ruby • JavaScript • TypeScript",
+    detail: "今まで作ったもの",
+    role: "WebS / WebD / iPhone",
     year: "2024–",
-    highlights: ["体験設計とUI/UX", "リアルタイム3D表現", "プロトタイピング"],
-    images: ["/images/gil.jpg","/images/placeholder-cyber.svg","/images/placeholder-cyber.svg"],
+    highlights: ["WebS", "WebD", "iPhone"],
+    images: ["/images/gil.jpg"],
   },
   {
     id: 1,
-    name: "SaunaMix",
+    name: "Google Calendar スケジューラー",
     position: [3, 1, -2],
-    color: "#00f5ff",
+    color: "#7A2CFF",
     type: "project",
-    description: "Apple Watch × AI：ととのい体験を可視化",
-    stack: "SwiftUI • HealthKit • Node/Express",
-    link: "https://example.com",
-    detail: "心拍や体温などの生体情報を元に、ととのい指標を可視化するプロトタイプ。",
-    role: "iOS / Backend",
-    year: "2023",
-    highlights: ["HealthKit連携", "リアルタイム可視化", "AIによるセッション分析"],
-    images: ["/images/placeholder-cyber.svg"],
+    description:
+      "SlackでGoogle Calendarの予定から空き時間を共有し、予定を作成できる",
+    stack: "Slack API • TypeScript • Google Calendar API • Node.js • Supabase",
+    links: [
+      {
+        label: "GitHub",
+        href: "https://github.com/gil0304/GoogleCalendar-SlackApp.git",
+      },
+      {
+        label: "Install",
+        href: "https://googlecalendar-slackapp.onrender.com/slack/install",
+      },
+    ],
+    detail: "企画からコーディングまで全て1人で実装",
+    role: "Backend",
+    year: "2026",
+    highlights: ["Slack", "Google Calendar"],
+    images: ["/images/gcal/gcal-app.png", "/images/gcal/gcal-detail.png"],
   },
   {
     id: 2,
-    name: "HeiseiCamera",
+    name: "パントバーグ様 Webサイト",
     position: [-3, 2, -1],
-    color: "#9d4edd",
+    color: "#FFF87A",
     type: "project",
-    description: "平成っぽいフィルターで撮れるカメラ",
-    stack: "iOS • Vision • AR",
-    detail: "平成の写ルンです的な質感を再現するために、色味とノイズを細かく調整。",
-    role: "iOS / Creative",
-    year: "2022",
-    highlights: ["フィルター設計", "Vision活用", "レトロ表現"],
-    images: ["/images/placeholder-cyber.svg"],
+    description: "山梨県にあるパントバーグ様のWebサイト",
+    stack: "Web • HTML • css • JavaScript",
+    links: [
+      {
+        label: "Webサイト",
+        href: "https://pantoburg.com/",
+      },
+    ],
+    detail: "主にコーディングを担当",
+    role: "Frontend",
+    year: "2024",
+    highlights: ["情報設計", "コーディング"],
+    images: ["/images/pantoburg/home.png"],
   },
   {
     id: 3,
-    name: "Motohei Web",
+    name: "地酒のモトヘイ様 Webサイト",
     position: [2, -2, 1],
-    color: "#ff00ff",
+    color: "#2F7BFF",
     type: "project",
-    description: "酒屋サイトの企画・デザイン・実装",
-    stack: "Next.js • UI/UX • Content",
-    detail: "ブランディングから導線設計まで一貫して担当し、回遊性を高めたEC体験。",
+    description:
+      "地酒のモトヘイ様のWebサイトの山梨地酒の特集ページ、お店の紹介ページ",
+    stack: "HTML • css • UI/UX • Content",
+    links: [
+      {
+        label: "山梨地酒の特集ページ",
+        href: "https://jizake-motohei.com/?mode=f7",
+      },
+      {
+        label: "お店の紹介ページ",
+        href: "https://jizake-motohei.com/?mode=f8",
+      },
+    ],
+    detail: "企画からコーディングまで担当",
     role: "Design / Frontend",
-    year: "2021",
+    year: "2026",
     highlights: ["情報設計", "コンテンツ制作", "Next.js最適化"],
-    images: ["/images/placeholder-cyber.svg"],
+    images: ["/images/motohei/jizake.png", "/images/motohei/about.png"],
   },
-  {
-    id: 4,
-    name: "SkillChecker",
-    position: [-2, -1, 2],
-    color: "#00ff88",
-    type: "project",
-    description: "学習者の理解をチェックするRAG/問題生成",
-    stack: "Next.js • RAG • OpenAI",
-    detail: "教材から理解度を測る問題を自動生成し、学習の抜けを可視化。",
-    role: "Frontend / AI",
-    year: "2024",
-    highlights: ["RAG構成", "問題生成", "学習ダッシュボード"],
-    images: ["/images/placeholder-cyber.svg"],
-  },
-]
+  // {
+  //   id: 4,
+  //   name: "SkillChecker",
+  //   position: [-2, -1, 2],
+  //   color: "#00ff88",
+  //   type: "project",
+  //   description: "学習者の理解をチェックするRAG/問題生成",
+  //   stack: "Next.js • RAG • OpenAI",
+  //   detail: "教材から理解度を測る問題を自動生成し、学習の抜けを可視化。",
+  //   role: "Frontend / AI",
+  //   year: "2024",
+  //   highlights: ["RAG構成", "問題生成", "学習ダッシュボード"],
+  //   images: ["/images/placeholder-cyber.svg"],
+  // },
+];

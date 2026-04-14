@@ -522,6 +522,12 @@
   opacity: 0.85;
 }
 
+.detail-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .detail-link {
   align-self: flex-start;
   font-size: 12px;

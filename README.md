@@ -45,6 +45,18 @@ npm run preview
 3. `color`（ノード/ラベル/強調色）
 4. `highlights`（箇条書き）
 5. `images`（詳細カードの画像パス）
+6. `links`（作品ごとの任意リンク）
+
+リンクは以下のように設定できます。
+
+```ts
+links: [
+  { label: "GitHub", href: "https://github.com/..." },
+  { label: "Demo", href: "https://example.com" },
+]
+```
+
+旧形式の `link: "https://..."` もそのまま使えます。
 
 画像は `public/images` に配置し、`/images/xxx.jpg` の形で指定します。
 

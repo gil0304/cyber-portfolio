@@ -1,13 +1,13 @@
-import { Line } from "@react-three/drei"
-import { useFrame } from "@react-three/fiber"
-import { useMemo, useRef } from "react"
-import { AdditiveBlending, Mesh, Vector3 } from "three"
-import type { Project } from "../data/projects"
+import { Line } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
+import { useMemo, useRef } from "react";
+import { AdditiveBlending, Mesh, Vector3 } from "three";
+import type { Project } from "../data/projects";
 
 type Props = {
-  projects: Project[]
-  query?: string
-}
+  projects: Project[];
+  query?: string;
+};
 
 function Pulse({
   from,
@@ -17,20 +17,20 @@ function Pulse({
   phase,
   opacity = 0.85,
 }: {
-  from: Vector3
-  to: Vector3
-  speed: number
-  color: string
-  phase: number
-  opacity?: number
+  from: Vector3;
+  to: Vector3;
+  speed: number;
+  color: string;
+  phase: number;
+  opacity?: number;
 }) {
-  const meshRef = useRef<Mesh>(null!)
-  const dir = useMemo(() => new Vector3().subVectors(to, from), [from, to])
+  const meshRef = useRef<Mesh>(null!);
+  const dir = useMemo(() => new Vector3().subVectors(to, from), [from, to]);
 
   useFrame((state) => {
-    const t = (state.clock.elapsedTime * speed + phase) % 1
-    meshRef.current.position.copy(from).addScaledVector(dir, t)
-  })
+    const t = (state.clock.elapsedTime * speed + phase) % 1;
+    meshRef.current.position.copy(from).addScaledVector(dir, t);
+  });
 
   return (
     <mesh ref={meshRef}>
@@ -43,7 +43,7 @@ function Pulse({
         toneMapped={false}
       />
     </mesh>
-  )
+  );
 }
 
 function WavyLine({
@@ -53,48 +53,51 @@ function WavyLine({
   opacity,
   phase,
 }: {
-  from: Vector3
-  to: Vector3
-  color: string
-  opacity: number
-  phase: number
+  from: Vector3;
+  to: Vector3;
+  color: string;
+  opacity: number;
+  phase: number;
 }) {
-  const segments = 24
-  const lineRef = useRef<any>(null!)
-  const positions = useMemo(() => new Float32Array(segments * 3), [segments])
-  const points = useMemo(() => Array.from({ length: segments }, () => new Vector3()), [segments])
-  const dir = useMemo(() => new Vector3(), [])
-  const perp = useMemo(() => new Vector3(), [])
-  const up = useMemo(() => new Vector3(0, 1, 0), [])
-  const alt = useMemo(() => new Vector3(1, 0, 0), [])
-  const temp = useMemo(() => new Vector3(), [])
+  const segments = 24;
+  const lineRef = useRef<any>(null!);
+  const positions = useMemo(() => new Float32Array(segments * 3), [segments]);
+  const points = useMemo(
+    () => Array.from({ length: segments }, () => new Vector3()),
+    [segments],
+  );
+  const dir = useMemo(() => new Vector3(), []);
+  const perp = useMemo(() => new Vector3(), []);
+  const up = useMemo(() => new Vector3(0, 1, 0), []);
+  const alt = useMemo(() => new Vector3(1, 0, 0), []);
+  const temp = useMemo(() => new Vector3(), []);
 
   useFrame((state) => {
-    if (!lineRef.current) return
-    dir.copy(to).sub(from).normalize()
-    const axis = Math.abs(dir.y) > 0.9 ? alt : up
-    perp.copy(dir).cross(axis).normalize()
+    if (!lineRef.current) return;
+    dir.copy(to).sub(from).normalize();
+    const axis = Math.abs(dir.y) > 0.9 ? alt : up;
+    perp.copy(dir).cross(axis).normalize();
 
-    const time = state.clock.elapsedTime
-    const frequency = 8.0
-    const amplitude = 0.035
-    const speed = 1.6
+    const time = state.clock.elapsedTime;
+    const frequency = 8.0;
+    const amplitude = 0.035;
+    const speed = 1.6;
 
     for (let i = 0; i < segments; i += 1) {
-      const t = i / (segments - 1)
-      temp.copy(from).lerp(to, t)
-      const wave = Math.sin(t * frequency + time * speed + phase) * amplitude
-      temp.addScaledVector(perp, wave)
-      const idx = i * 3
-      positions[idx] = temp.x
-      positions[idx + 1] = temp.y
-      positions[idx + 2] = temp.z
+      const t = i / (segments - 1);
+      temp.copy(from).lerp(to, t);
+      const wave = Math.sin(t * frequency + time * speed + phase) * amplitude;
+      temp.addScaledVector(perp, wave);
+      const idx = i * 3;
+      positions[idx] = temp.x;
+      positions[idx + 1] = temp.y;
+      positions[idx + 2] = temp.z;
     }
 
     if (lineRef.current?.geometry?.setPositions) {
-      lineRef.current.geometry.setPositions(positions)
+      lineRef.current.geometry.setPositions(positions);
     }
-  })
+  });
 
   return (
     <Line
@@ -106,7 +109,7 @@ function WavyLine({
       opacity={opacity}
       toneMapped={false}
     />
-  )
+  );
 }
 
 function matchesQuery(project: Project, query: string) {
@@ -114,37 +117,44 @@ function matchesQuery(project: Project, query: string) {
     project.name,
     project.description,
     project.stack,
+    project.link,
     project.detail,
     project.role,
     project.year,
     ...(project.highlights ?? []),
+    ...(project.links?.flatMap((link) => [link.label, link.href]) ?? []),
   ]
     .filter(Boolean)
     .join(" ")
-    .toLowerCase()
+    .toLowerCase();
 
-  return haystack.includes(query)
+  return haystack.includes(query);
 }
 
 export default function Connections({ projects, query = "" }: Props) {
-  const core = projects.find((p) => p.id === 0)
-  const normalizedQuery = query.trim().toLowerCase()
-  const hasQuery = normalizedQuery.length > 0
+  const core = projects.find((p) => p.id === 0);
+  const normalizedQuery = query.trim().toLowerCase();
+  const hasQuery = normalizedQuery.length > 0;
 
   const corePos = useMemo(
-    () => new Vector3(core?.position[0] ?? 0, core?.position[1] ?? 0, core?.position[2] ?? 0),
-    [core]
-  )
+    () =>
+      new Vector3(
+        core?.position[0] ?? 0,
+        core?.position[1] ?? 0,
+        core?.position[2] ?? 0,
+      ),
+    [core],
+  );
 
   return (
     <>
       {projects
         .filter((p) => p.id !== 0)
         .map((p, i) => {
-          const to = new Vector3(p.position[0], p.position[1], p.position[2])
-          const isMatch = !hasQuery || matchesQuery(p, normalizedQuery)
-          const lineOpacity = hasQuery ? (isMatch ? 0.65 : 0.42) : 0.42
-          const pulseOpacity = hasQuery ? (isMatch ? 0.95 : 0.85) : 0.85
+          const to = new Vector3(p.position[0], p.position[1], p.position[2]);
+          const isMatch = !hasQuery || matchesQuery(p, normalizedQuery);
+          const lineOpacity = hasQuery ? (isMatch ? 0.65 : 0.42) : 0.42;
+          const pulseOpacity = hasQuery ? (isMatch ? 0.95 : 0.85) : 0.85;
 
           return (
             <group key={p.id}>
@@ -174,8 +184,8 @@ export default function Connections({ projects, query = "" }: Props) {
                 opacity={pulseOpacity * 0.85}
               />
             </group>
-          )
+          );
         })}
     </>
-  )
+  );
 }

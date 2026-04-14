@@ -1,34 +1,35 @@
-import { Html } from "@react-three/drei"
-import { useMemo } from "react"
-import { useThree } from "@react-three/fiber"
-import type { Project } from "../data/projects"
+import { Html } from "@react-three/drei";
+import { useMemo } from "react";
+import { useThree } from "@react-three/fiber";
+import type { Project } from "../data/projects";
+import { getProjectLinks } from "../utils/projectLinks";
 
 export default function NodeCard({
   project,
   onClose,
   onOpenDetail,
 }: {
-  project: Project
-  onClose: () => void
-  onOpenDetail?: (project: Project) => void
+  project: Project;
+  onClose: () => void;
+  onOpenDetail?: (project: Project) => void;
 }) {
-  const [x, y, z] = project.position
-  const { size } = useThree()
-  const isCompact = size.width < 720
-  const tag = project.type === "core" ? "CORE NODE" : "PROJECT"
+  const [x, y, z] = project.position;
+  const { size } = useThree();
+  const isCompact = size.width < 720;
+  const tag = project.type === "core" ? "CORE NODE" : "PROJECT";
+  const links = getProjectLinks(project);
   const styles = useMemo(() => {
-    const rgb = hexToRgb(project.color) ?? { r: 0, g: 245, b: 255 }
-    return buildStyles(rgb, isCompact)
-  }, [project.color, isCompact])
+    const rgb = hexToRgb(project.color) ?? { r: 0, g: 245, b: 255 };
+    return buildStyles(rgb, isCompact);
+  }, [project.color, isCompact]);
 
-  const offset = isCompact ? [0, 1.05, 0] : [1.2, 0.6, 0]
+  const offset = isCompact ? [0, 1.05, 0] : [1.2, 0.6, 0];
 
   return (
     <Html
       position={[x + offset[0], y + offset[1], z + offset[2]]}
       center
       style={{ pointerEvents: "auto" }}
-      // ✅ transform/occlude は使わない（巨大化＆灰色メッシュ回避）
     >
       <div className="node-card" style={styles.card}>
         <div style={styles.grid} />
@@ -41,7 +42,9 @@ export default function NodeCard({
             <div style={styles.title}>{project.name}</div>
             <div style={styles.metaRow}>
               <span style={styles.chip}>{tag}</span>
-              <span style={styles.idText}>ID {String(project.id).padStart(2, "0")}</span>
+              <span style={styles.idText}>
+                ID {String(project.id).padStart(2, "0")}
+              </span>
             </div>
           </div>
           <button style={styles.close} onClick={onClose} aria-label="close">
@@ -49,7 +52,9 @@ export default function NodeCard({
           </button>
         </div>
 
-        {project.description && <div style={styles.desc}>{project.description}</div>}
+        {project.description && (
+          <div style={styles.desc}>{project.description}</div>
+        )}
 
         {project.stack && (
           <div style={styles.stack}>
@@ -68,45 +73,51 @@ export default function NodeCard({
               DETAIL
             </button>
           )}
-          {project.link && (
-            <a style={styles.link} href={project.link} target="_blank" rel="noreferrer">
-              OPEN ↗
+          {links.map((link) => (
+            <a
+              key={`${project.id}-${link.label}-${link.href}`}
+              style={styles.link}
+              href={link.href}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {link.label} ↗
             </a>
-          )}
+          ))}
         </div>
       </div>
     </Html>
-  )
+  );
 }
 
-type Rgb = { r: number; g: number; b: number }
+type Rgb = { r: number; g: number; b: number };
 
 function hexToRgb(hex: string): Rgb | null {
-  const normalized = hex.replace("#", "").trim()
+  const normalized = hex.replace("#", "").trim();
   if (normalized.length === 3) {
-    const r = parseInt(normalized[0] + normalized[0], 16)
-    const g = parseInt(normalized[1] + normalized[1], 16)
-    const b = parseInt(normalized[2] + normalized[2], 16)
-    return { r, g, b }
+    const r = parseInt(normalized[0] + normalized[0], 16);
+    const g = parseInt(normalized[1] + normalized[1], 16);
+    const b = parseInt(normalized[2] + normalized[2], 16);
+    return { r, g, b };
   }
   if (normalized.length === 6) {
-    const r = parseInt(normalized.slice(0, 2), 16)
-    const g = parseInt(normalized.slice(2, 4), 16)
-    const b = parseInt(normalized.slice(4, 6), 16)
-    return { r, g, b }
+    const r = parseInt(normalized.slice(0, 2), 16);
+    const g = parseInt(normalized.slice(2, 4), 16);
+    const b = parseInt(normalized.slice(4, 6), 16);
+    return { r, g, b };
   }
-  return null
+  return null;
 }
 
 function rgba(rgb: Rgb, a: number) {
-  return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${a})`
+  return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${a})`;
 }
 
 function buildStyles(rgb: Rgb, isCompact: boolean) {
-  const accentSoft = rgba(rgb, 0.12)
-  const accentMid = rgba(rgb, 0.5)
-  const accentStrong = rgba(rgb, 0.85)
-  const accentGlow = rgba(rgb, 0.2)
+  const accentSoft = rgba(rgb, 0.12);
+  const accentMid = rgba(rgb, 0.5);
+  const accentStrong = rgba(rgb, 0.85);
+  const accentGlow = rgba(rgb, 0.2);
 
   const card: React.CSSProperties = {
     width: isCompact ? "min(280px, 78vw)" : 300,
@@ -120,19 +131,19 @@ function buildStyles(rgb: Rgb, isCompact: boolean) {
     fontFamily: "var(--font-body)",
     position: "relative",
     overflow: "hidden",
-  }
+  };
 
   const grid: React.CSSProperties = {
     position: "absolute",
     inset: 0,
     backgroundImage: `linear-gradient(${rgba(rgb, 0.12)} 1px, transparent 1px), linear-gradient(90deg, ${rgba(
       rgb,
-      0.12
+      0.12,
     )} 1px, transparent 1px)`,
     backgroundSize: "22px 22px",
     opacity: 0.25,
     pointerEvents: "none",
-  }
+  };
 
   const topGlow: React.CSSProperties = {
     position: "absolute",
@@ -142,11 +153,11 @@ function buildStyles(rgb: Rgb, isCompact: boolean) {
     height: 2,
     background: `linear-gradient(90deg, ${rgba(rgb, 0)}, ${accentStrong}, ${rgba(
       rgb,
-      0
+      0,
     )})`,
     boxShadow: `0 0 12px ${accentStrong}`,
     pointerEvents: "none",
-  }
+  };
 
   const cornerTL: React.CSSProperties = {
     position: "absolute",
@@ -157,7 +168,7 @@ function buildStyles(rgb: Rgb, isCompact: boolean) {
     borderTop: `2px solid ${rgba(rgb, 0.8)}`,
     borderLeft: `2px solid ${rgba(rgb, 0.8)}`,
     pointerEvents: "none",
-  }
+  };
 
   const cornerBR: React.CSSProperties = {
     position: "absolute",
@@ -168,7 +179,7 @@ function buildStyles(rgb: Rgb, isCompact: boolean) {
     borderBottom: `2px solid ${rgba(rgb, 0.7)}`,
     borderRight: `2px solid ${rgba(rgb, 0.7)}`,
     pointerEvents: "none",
-  }
+  };
 
   const titleRow: React.CSSProperties = {
     display: "flex",
@@ -176,7 +187,7 @@ function buildStyles(rgb: Rgb, isCompact: boolean) {
     justifyContent: "space-between",
     gap: 10,
     marginBottom: 10,
-  }
+  };
 
   const title: React.CSSProperties = {
     fontSize: 19,
@@ -185,14 +196,14 @@ function buildStyles(rgb: Rgb, isCompact: boolean) {
     color: accentStrong,
     fontFamily: "var(--font-title)",
     textShadow: `0 0 12px ${rgba(rgb, 0.45)}`,
-  }
+  };
 
   const metaRow: React.CSSProperties = {
     display: "flex",
     gap: 8,
     alignItems: "center",
     marginTop: 4,
-  }
+  };
 
   const chip: React.CSSProperties = {
     fontSize: 10,
@@ -202,20 +213,20 @@ function buildStyles(rgb: Rgb, isCompact: boolean) {
     border: `1px solid ${accentMid}`,
     color: accentStrong,
     background: rgba(rgb, 0.08),
-  }
+  };
 
   const idText: React.CSSProperties = {
     fontSize: 11,
     letterSpacing: 1.1,
     opacity: 0.75,
-  }
+  };
 
   const desc: React.CSSProperties = {
     fontSize: 13,
     opacity: 0.92,
     lineHeight: 1.45,
     marginBottom: 12,
-  }
+  };
 
   const stack: React.CSSProperties = {
     display: "flex",
@@ -224,19 +235,19 @@ function buildStyles(rgb: Rgb, isCompact: boolean) {
     marginBottom: 12,
     paddingTop: 8,
     borderTop: `1px dashed ${rgba(rgb, 0.25)}`,
-  }
+  };
 
   const label: React.CSSProperties = {
     fontSize: 10,
     opacity: 0.7,
     letterSpacing: 1.2,
     fontFamily: "var(--font-title)",
-  }
+  };
 
   const value: React.CSSProperties = {
     fontSize: 12,
     opacity: 0.9,
-  }
+  };
 
   const link: React.CSSProperties = {
     fontSize: 12,
@@ -246,14 +257,14 @@ function buildStyles(rgb: Rgb, isCompact: boolean) {
     padding: "8px 12px",
     borderRadius: 10,
     background: `linear-gradient(90deg, ${rgba(rgb, 0.18)}, ${rgba(rgb, 0.04)})`,
-  }
+  };
 
   const actions: React.CSSProperties = {
     display: "flex",
     gap: 8,
     alignItems: "center",
     flexWrap: "wrap",
-  }
+  };
 
   const detailButton: React.CSSProperties = {
     fontSize: 12,
@@ -264,7 +275,7 @@ function buildStyles(rgb: Rgb, isCompact: boolean) {
     background: rgba(rgb, 0.1),
     color: accentStrong,
     cursor: "pointer",
-  }
+  };
 
   const close: React.CSSProperties = {
     width: 28,
@@ -274,7 +285,7 @@ function buildStyles(rgb: Rgb, isCompact: boolean) {
     background: rgba(rgb, 0.08),
     color: "white",
     cursor: "pointer",
-  }
+  };
 
   return {
     card,
@@ -295,5 +306,5 @@ function buildStyles(rgb: Rgb, isCompact: boolean) {
     close,
     actions,
     detailButton,
-  }
+  };
 }

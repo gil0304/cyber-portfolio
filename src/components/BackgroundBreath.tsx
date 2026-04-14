@@ -1,17 +1,17 @@
-import { useFrame } from "@react-three/fiber"
-import { useRef } from "react"
-import { AdditiveBlending, BackSide, Color, ShaderMaterial } from "three"
-import { breathPulse } from "../utils/breath"
+import { useFrame } from "@react-three/fiber";
+import { useRef } from "react";
+import { AdditiveBlending, BackSide, Color, ShaderMaterial } from "three";
+import { breathPulse } from "../utils/breath";
 
 export default function BackgroundBreath() {
-  const materialRef = useRef<ShaderMaterial>(null!)
+  const materialRef = useRef<ShaderMaterial>(null!);
 
   useFrame((state) => {
-    const pulse = breathPulse(state.clock.elapsedTime)
+    const pulse = breathPulse(state.clock.elapsedTime);
     if (materialRef.current) {
-      materialRef.current.uniforms.uPulse.value = pulse
+      materialRef.current.uniforms.uPulse.value = pulse;
     }
-  })
+  });
 
   return (
     <mesh scale={40} renderOrder={-10}>
@@ -31,7 +31,7 @@ export default function BackgroundBreath() {
         }}
       />
     </mesh>
-  )
+  );
 }
 
 const backgroundVertex = `
@@ -44,7 +44,7 @@ void main() {
   vViewDir = normalize(-mvPos.xyz);
   gl_Position = projectionMatrix * mvPos;
 }
-`
+`;
 
 const backgroundFragment = `
 uniform vec3 uColor;
@@ -59,4 +59,4 @@ void main() {
   float alpha = glow * pulse * 0.22;
   gl_FragColor = vec4(uColor, alpha);
 }
-`
+`;
